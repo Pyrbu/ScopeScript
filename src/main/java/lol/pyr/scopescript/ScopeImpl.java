@@ -1,21 +1,20 @@
 package lol.pyr.scopescript;
 
-import lol.pyr.scopescript.api.Scope;
+import lol.pyr.scopescript.api.Executable;
+import lol.pyr.scopescript.api.VariableScope;
 import lol.pyr.scopescript.exception.UnknownVariableException;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class ScopeImpl implements Scope {
-    private final ScopeImpl parent;
+public class ScopeImpl implements VariableScope, Executable {
+    private final VariableScope parent;
     private final Map<String, Variable> memberMap = new HashMap<>();
+    private final Executable[] operations;
 
-    public ScopeImpl(ScopeImpl parent) {
+    public ScopeImpl(VariableScope parent, Executable... operations) {
         this.parent = parent;
-    }
-
-    public ScopeImpl() {
-        this.parent = null;
+        this.operations = operations;
     }
 
     public Variable getVariable(String identifier) throws UnknownVariableException {
@@ -30,12 +29,17 @@ public class ScopeImpl implements Scope {
         if (!setVariableIfExists(identifier, member)) memberMap.put(identifier, member);
     }
 
-    private boolean setVariableIfExists(String identifier, Variable member) {
+    public boolean setVariableIfExists(String identifier, Variable member) {
         if (!memberMap.containsKey(identifier)) {
             if (parent != null) return parent.setVariableIfExists(identifier, member);
             return false;
         }
-        setVariable(identifier, member);
+        memberMap.put(identifier, member);
         return true;
+    }
+
+    @Override
+    public void execute(VariableScope parent) throws Throwable {
+        for (Executable op : operations) op.execute(this);
     }
 }
