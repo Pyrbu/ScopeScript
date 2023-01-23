@@ -1,4 +1,4 @@
 package lol.pyr.scopescript.exception;
 
-public class IncorrectArgumentTypeException extends Throwable {
+public class IncorrectArgumentTypeException extends RuntimeException {
 }

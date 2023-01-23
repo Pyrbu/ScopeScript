@@ -1,4 +1,4 @@
 package lol.pyr.scopescript.exception;
 
-public class UnexpectedTypeException extends Throwable {
+public class UnexpectedTypeException extends RuntimeException {
 }

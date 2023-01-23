@@ -1,20 +1,20 @@
 package lol.pyr.scopescript.operations;
 
-import lol.pyr.scopescript.Variable;
 import lol.pyr.scopescript.api.Executable;
-import lol.pyr.scopescript.api.VariableProvider;
+import lol.pyr.scopescript.api.Expression;
 import lol.pyr.scopescript.api.VariableScope;
 
 public class PrintOperation implements Executable {
-    private final VariableProvider messageProvider;
+    private final VariableScope parent;
+    private final Expression messageExpression;
 
-    public PrintOperation(VariableProvider messageProvider) {
-        this.messageProvider = messageProvider;
+    public PrintOperation(VariableScope parent, Expression messageExpression) {
+        this.parent = parent;
+        this.messageExpression = messageExpression;
     }
 
     @Override
-    public void execute(VariableScope parent) throws Throwable {
-        Variable variable = messageProvider.get(parent);
-        System.out.println(variable.getValue());
+    public void execute() {
+        System.out.println(messageExpression.compute(parent));
     }
 }

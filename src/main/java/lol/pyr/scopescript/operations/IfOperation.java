@@ -1,28 +1,28 @@
 package lol.pyr.scopescript.operations;
 
-import lol.pyr.scopescript.ScopeImpl;
-import lol.pyr.scopescript.Variable;
+import lol.pyr.scopescript.Scope;
 import lol.pyr.scopescript.api.Executable;
+import lol.pyr.scopescript.api.Expression;
 import lol.pyr.scopescript.api.VariableScope;
-import lol.pyr.scopescript.api.VariableProvider;
 import lol.pyr.scopescript.exception.UnexpectedTypeException;
-import lol.pyr.scopescript.types.BooleanType;
 
-public class IfOperation extends ScopeImpl implements VariableScope, Executable {
-    private final VariableProvider conditionProvider;
-    private final Executable elseOperation;
+import java.util.function.Function;
 
-    public IfOperation(VariableScope parent, VariableProvider conditionProvider, Executable elseOperation, Executable... operations) {
-        super(parent, operations);
-        this.conditionProvider = conditionProvider;
-        this.elseOperation = elseOperation;
+public class IfOperation extends Scope implements VariableScope, Executable {
+    private final Expression conditionExpression;
+    private final Executable[] elseOperations;
+
+    public IfOperation(VariableScope parent, Expression conditionExpression, Function<VariableScope, Executable[]> elseOperationsProvider, Function<VariableScope, Executable[]> operationsProvider) {
+        super(parent, operationsProvider);
+        this.conditionExpression = conditionExpression;
+        this.elseOperations = elseOperationsProvider == null ? null : elseOperationsProvider.apply(this);
     }
 
     @Override
-    public void execute(VariableScope parent) throws Throwable {
-        Variable variable = conditionProvider.get(this);
-        if (!(variable.getType() instanceof BooleanType)) throw new UnexpectedTypeException();
-        if ((Boolean) variable.getValue()) execute(this);
-        else elseOperation.execute(parent);
+    public void execute() throws Throwable {
+        Object variable = conditionExpression.compute(this);
+        if (!(variable instanceof Boolean)) throw new UnexpectedTypeException();
+        if ((Boolean) variable) execute();
+        else if (elseOperations != null) for (Executable op : elseOperations) op.execute();
     }
 }
