@@ -1,0 +1,1 @@
+scope my_scope = (int a1, int b2, int c3) {}
