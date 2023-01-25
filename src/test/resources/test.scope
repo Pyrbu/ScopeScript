@@ -1,1 +1,3 @@
-scope my_scope = (int a1, int b2, int c3) {}
+// kuul komment
+
+scope my_scope = /* code that does cool stuff */ (int a1, int b2, int c3) {} // cumment

@@ -12,12 +12,16 @@ public class Tokenizer {
     private final List<Token> tokens = new ArrayList<>();
 
     public Tokenizer(String input) {
-        this.input = input;
+        this.input = filterComments(input);
         while (this.input.length() != 0) tokens.add(cosnume());
     }
 
     public List<Token> getTokens() {
         return Collections.unmodifiableList(tokens);
+    }
+
+    private String filterComments(String str) {
+        return str.replaceAll("/\\*(.|\\n)*\\*/|//.*(\\n|$)", "");
     }
 
     private Token cosnume() {
